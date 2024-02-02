@@ -3,6 +3,8 @@ git-rewind-days
 
 Bash-based command to rewind days at the latest commit of Git logs
 
+[![Lint](https://github.com/dceoy/git-rewind-days/actions/workflows/lint.yml/badge.svg)](https://github.com/dceoy/git-rewind-days/actions/workflows/lint.yml)
+
 Installation
 ------------
 
