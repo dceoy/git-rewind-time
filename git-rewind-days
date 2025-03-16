@@ -27,7 +27,7 @@ fi
 
 COMMAND_PATH=$(realpath "${0}")
 COMMAND_NAME=$(basename "${COMMAND_PATH}")
-COMMAND_VERSION='v0.1.0'
+COMMAND_VERSION='v0.2.0'
 DRY_RUN=0
 MAIN_ARGS=()
 
@@ -83,8 +83,8 @@ else
   abort 'too many arguments'
 fi
 
-COMMIT_DATE=$(git log -1 | sed -ne 's/^Date: \+//p')
-REWIDED_DATE=$(date -d "${COMMIT_DATE% *} - ${DAYS_TO_REWIND} days" | awk '{print $1" "$2" "$3" "$4" "$6}')" ${COMMIT_DATE##* }"
+COMMIT_DATE=$(git log -1 | sed -ne 's/^Date: *//p')
+REWIDED_DATE=$(date "-v-${DAYS_TO_REWIND}d" +"${COMMIT_DATE% *}")
 
 if [[ ${DRY_RUN} -eq 0 ]]; then
   git rebase HEAD^
