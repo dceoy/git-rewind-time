@@ -1,5 +1,5 @@
 ---
-name: Lint
+name: Lint for Shell
 on:
   push:
     branches:
@@ -8,8 +8,33 @@ on:
     branches:
       - master
   workflow_dispatch:
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+    working-directory: .
 jobs:
   lint:
-    uses: dceoy/gh-actions-for-devops/.github/workflows/shell-lint.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install --no-install-recommends --no-install-suggests shellcheck
+      - name: Execute shellcheck
+        working-directory: ${{ inputs.search-path }}
+        run: >
+          find . -type f -executable -name 'git-rewind-*' -print0
+          | xargs -0 -t shellcheck --external-sources
+  dependabot-auto-merge:
+    if: >
+      github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: dceoy/gh-actions-for-devops/.github/workflows/dependabot-auto-merge.yml@main
     with:
-      file-paths: git-rewind-*
+      unconditional: true
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
