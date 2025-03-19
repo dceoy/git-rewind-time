@@ -25,9 +25,10 @@ if [[ ${#} -ge 1 ]]; then
   done
 fi
 
-COMMAND_PATH=$(realpath "${0}")
-COMMAND_NAME=$(basename "${COMMAND_PATH}")
-COMMAND_VERSION='v0.2.0'
+COMMAND_PATH="$(realpath "${0}")"
+COMMAND_NAME="$(basename "${COMMAND_PATH}")"
+COMMAND_VERSION='v0.2.1'
+DATE="$(which gdate || which date)"
 DRY_RUN=0
 MAIN_ARGS=()
 
@@ -44,7 +45,7 @@ function abort {
     if [[ ${#} -eq 0 ]]; then
       cat -
     else
-      COMMAND_NAME=$(basename "${COMMAND_PATH}")
+      COMMAND_NAME="$(basename "${COMMAND_PATH}")"
       echo "${COMMAND_NAME}: ${*}"
     fi
   } >&2
@@ -83,8 +84,8 @@ else
   abort 'too many arguments'
 fi
 
-COMMIT_DATE=$(git log -1 | sed -ne 's/^Date: *//p')
-REWIDED_DATE=$(date "-v-${HOURS_TO_REWIND}H" +"${COMMIT_DATE% *}")
+COMMIT_DATE="$(git log -1 --date=rfc | sed -ne 's/^Date: *//p')"
+REWIDED_DATE="$(${DATE} -d "${COMMIT_DATE} - ${HOURS_TO_REWIND} hours" --rfc-2822)"
 
 if [[ ${DRY_RUN} -eq 0 ]]; then
   git rebase HEAD^
