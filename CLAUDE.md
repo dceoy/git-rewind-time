@@ -4,9 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This repository contains Bash utilities for manipulating Git commit dates. The main scripts are:
-- `git-rewind-days`: Rewinds the latest commit date by a specified number of days
-- `git-rewind-hours`: Rewinds the latest commit date by a specified number of hours
+This repository contains Bash utilities for manipulating Git commit dates. The main script is:
+- `git-rewind-time`: Rewinds the latest commit date by a specified amount of time (supports days, hours, minutes, seconds, weeks, months, years)
 
 ## Common Commands
 
@@ -19,16 +18,18 @@ find . -type f -executable -name 'git-rewind-*' -print0 | xargs -0 shellcheck --
 ### Testing Scripts
 ```bash
 # Test dry-run mode
-./git-rewind-days --dry-run 7
-./git-rewind-hours --dry-run 24
+./git-rewind-time --dry-run 7 days
+./git-rewind-time --dry-run 24 hours
+./git-rewind-time --dry-run 30 minutes
+./git-rewind-time --dry-run 2 weeks
 
 # Debug mode
-./git-rewind-days --debug 1
+./git-rewind-time --debug 1 hour
 ```
 
 ## Architecture Notes
 
-1. **Date Command Detection**: Both scripts automatically detect whether to use GNU date (`gdate`) or BSD date, making them portable across macOS and Linux systems.
+1. **Date Command Detection**: The script automatically detects whether to use GNU date (`gdate`) or BSD date, making it portable across macOS and Linux systems.
 
 2. **Git Operations**: Scripts use `git rebase` and `git commit --amend` to modify commit timestamps while preserving the commit content.
 
@@ -43,7 +44,7 @@ find . -type f -executable -name 'git-rewind-*' -print0 | xargs -0 shellcheck --
    - Use ShellCheck directives when needed for false positives
    - Include proper help text in script comments
 
-2. **Version Updates**: Version numbers are hardcoded in each script (currently v0.2.1) and should be updated when making changes.
+2. **Version Updates**: Version numbers are hardcoded in the script (currently v0.3.0) and should be updated when making changes.
 
 3. **Git Safety**: Always test changes with `--dry-run` flag first to ensure Git operations work as expected.
 
