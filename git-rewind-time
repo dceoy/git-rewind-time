@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+#
+# Rewind time at the latest commit of Git logs
+#
+# Usage:
+#   git-rewind-time [--debug] [--dry-run] <int> <unit>
+#   git-rewind-time --version
+#   git-rewind-time -h|--help
+#
+# Options:
+#   --debug           Debug mode
+#   --dry-run         Execute a dry run
+#   --version         Print version
+#   -h, --help        Print usage
+#
+# Arguments:
+#   <int>             Amount of time to rewind
+#   <unit>            Time unit (days, hours, minutes, seconds, weeks, months, years)
+#                     Aliases: d (days), h (hours), m (minutes), w (weeks)
+#
+# Examples:
+#   git-rewind-time 7 days
+#   git-rewind-time 24 hours
+#   git-rewind-time 30 minutes
+#   git-rewind-time 2 weeks
+#   git-rewind-time 7 d       # Same as "7 days"
+#   git-rewind-time 24 h      # Same as "24 hours"
+#   git-rewind-time 30 m      # Same as "30 minutes"
+#   git-rewind-time 2 w       # Same as "2 weeks"
+
+
+set -eu
+
+if [[ ${#} -ge 1 ]]; then
+  for a in "${@}"; do
+    [[ "${a}" = '--debug' ]] && set -x && break
+  done
+fi
+
+COMMAND_PATH="$(realpath "${0}")"
+COMMAND_NAME="$(basename "${COMMAND_PATH}")"
+COMMAND_VERSION='v0.3.0'
+DATE="$(which gdate || which date)"
+DRY_RUN=0
+MAIN_ARGS=()
+
+function print_version {
+  echo "${COMMAND_NAME}: ${COMMAND_VERSION}"
+}
+
+function print_usage {
+  sed -ne '1,2d; /^#/!q; s/^#$/# /; s/^# //p;' "${COMMAND_PATH}"
+}
+
+function abort {
+  {
+    if [[ ${#} -eq 0 ]]; then
+      cat -
+    else
+      COMMAND_NAME="$(basename "${COMMAND_PATH}")"
+      echo "${COMMAND_NAME}: ${*}"
+    fi
+  } >&2
+  exit 1
+}
+
+while [[ ${#} -ge 1 ]]; do
+  case "${1}" in
+    '--debug' )
+      shift 1
+      ;;
+    '--dry-run' )
+      DRY_RUN=1 && shift 1
+      ;;
+    '--version' )
+      print_version && exit 0
+      ;;
+    '-h' | '--help' )
+      print_usage && exit 0
+      ;;
+    -* )
+      abort "invalid option: ${1}"
+      ;;
+    * )
+      MAIN_ARGS+=("${1}") && shift 1
+      ;;
+  esac
+done
+
+if [[ ${#MAIN_ARGS[@]} -eq 2 ]]; then
+  TIME_TO_REWIND="${MAIN_ARGS[0]}"
+  TIME_UNIT="${MAIN_ARGS[1]}"
+  
+  # Validate time unit
+  case "${TIME_UNIT}" in
+    day | days | d | hour | hours | h | minute | minutes | m | second | seconds | week | weeks | w | month | months | year | years )
+      # Normalize to singular form for consistency
+      case "${TIME_UNIT}" in
+        days | d ) TIME_UNIT="day" ;;
+        hours | h ) TIME_UNIT="hour" ;;
+        minutes | m ) TIME_UNIT="minute" ;;
+        seconds ) TIME_UNIT="second" ;;
+        weeks | w ) TIME_UNIT="week" ;;
+        months ) TIME_UNIT="month" ;;
+        years ) TIME_UNIT="year" ;;
+      esac
+      ;;
+    * )
+      abort "invalid time unit: ${TIME_UNIT}. Valid units are: days, hours, minutes, seconds, weeks, months, years (aliases: d, h, m, w)"
+      ;;
+  esac
+  
+  printf "TIME_TO_REWIND:\t%d %s%s\n" "${TIME_TO_REWIND}" "${TIME_UNIT}" "$([[ ${TIME_TO_REWIND} -eq 1 ]] || echo 's')"
+elif [[ ${#MAIN_ARGS[@]} -eq 0 ]]; then
+  abort 'missing arguments'
+elif [[ ${#MAIN_ARGS[@]} -eq 1 ]]; then
+  abort 'missing time unit argument'
+else
+  abort 'too many arguments'
+fi
+
+COMMIT_DATE="$(git log -1 --date=rfc | sed -ne 's/^Date: *//p')"
+REWOUND_DATE="$(${DATE} -d "${COMMIT_DATE} - ${TIME_TO_REWIND} ${TIME_UNIT}s" --rfc-2822)"
+
+if [[ ${DRY_RUN} -eq 0 ]]; then
+  git rebase HEAD^
+  git commit --amend --no-edit --date "${REWOUND_DATE}"
+  git rebase HEAD^ --committer-date-is-author-date
+else
+  echo 'git rebase HEAD^'
+  echo "git commit --amend --no-edit --date \"${REWOUND_DATE}\""
+  echo 'git rebase HEAD^ --committer-date-is-author-date'
+fi
