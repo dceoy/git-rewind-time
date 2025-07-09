@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "find . -type f -executable -name 'git-rewind-*' -print0 | xargs -0 shellcheck --external-sources"
+          }
+        ]
+      }
+    ]
+  }
+}

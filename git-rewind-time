@@ -16,12 +16,17 @@
 # Arguments:
 #   <int>             Amount of time to rewind
 #   <unit>            Time unit (days, hours, minutes, seconds, weeks, months, years)
+#                     Aliases: d (days), h (hours), m (minutes), w (weeks)
 #
 # Examples:
 #   git-rewind-time 7 days
 #   git-rewind-time 24 hours
 #   git-rewind-time 30 minutes
 #   git-rewind-time 2 weeks
+#   git-rewind-time 7 d       # Same as "7 days"
+#   git-rewind-time 24 h      # Same as "24 hours"
+#   git-rewind-time 30 m      # Same as "30 minutes"
+#   git-rewind-time 2 w       # Same as "2 weeks"
 
 
 set -eu
@@ -88,20 +93,20 @@ if [[ ${#MAIN_ARGS[@]} -eq 2 ]]; then
   
   # Validate time unit
   case "${TIME_UNIT}" in
-    day | days | hour | hours | minute | minutes | second | seconds | week | weeks | month | months | year | years )
+    day | days | d | hour | hours | h | minute | minutes | m | second | seconds | week | weeks | w | month | months | year | years )
       # Normalize to singular form for consistency
       case "${TIME_UNIT}" in
-        days ) TIME_UNIT="day" ;;
-        hours ) TIME_UNIT="hour" ;;
-        minutes ) TIME_UNIT="minute" ;;
+        days | d ) TIME_UNIT="day" ;;
+        hours | h ) TIME_UNIT="hour" ;;
+        minutes | m ) TIME_UNIT="minute" ;;
         seconds ) TIME_UNIT="second" ;;
-        weeks ) TIME_UNIT="week" ;;
+        weeks | w ) TIME_UNIT="week" ;;
         months ) TIME_UNIT="month" ;;
         years ) TIME_UNIT="year" ;;
       esac
       ;;
     * )
-      abort "invalid time unit: ${TIME_UNIT}. Valid units are: days, hours, minutes, seconds, weeks, months, years"
+      abort "invalid time unit: ${TIME_UNIT}. Valid units are: days, hours, minutes, seconds, weeks, months, years (aliases: d, h, m, w)"
       ;;
   esac
   
