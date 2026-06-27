@@ -1,12 +1,10 @@
-git-rewind-time
-===============
+# git-rewind-time
 
 Bash-based command to rewind time at the latest commit of Git logs
 
 [![CI/CD](https://github.com/dceoy/git-rewind-time/actions/workflows/ci.yml/badge.svg)](https://github.com/dceoy/git-rewind-time/actions/workflows/ci.yml)
 
-Installation
-------------
+## Installation
 
 This command depends on git.
 
@@ -16,8 +14,7 @@ $ curl -SO https://raw.githubusercontent.com/dceoy/git-rewind-time/master/git-re
 $ chmod +x git-rewind-time
 ```
 
-Example
--------
+## Example
 
 Rewind the latest commit date for 7 days
 
@@ -25,8 +22,7 @@ Rewind the latest commit date for 7 days
 $ git-rewind-time 7 days
 ```
 
-Usage
------
+## Usage
 
 ```sh
 $ git-rewind-time --help

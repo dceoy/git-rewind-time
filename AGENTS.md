@@ -3,17 +3,20 @@
 ## Repository Overview
 
 This repository contains Bash utilities for manipulating Git commit dates. The main script is:
+
 - `git-rewind-time`: Rewinds the latest commit date by a specified amount of time (supports days, hours, minutes, seconds, weeks, months, years)
 
 ## Common Commands
 
 ### Linting
+
 ```bash
 # Run ShellCheck on all executable files
 find . -type f -executable -name 'git-rewind-*' -print0 | xargs -0 shellcheck --external-sources
 ```
 
 ### Testing Scripts
+
 ```bash
 # Test dry-run mode
 ./git-rewind-time --dry-run 7 days
