@@ -3,7 +3,7 @@ git-rewind-time
 
 Bash-based command to rewind time at the latest commit of Git logs
 
-[![Lint](https://github.com/dceoy/git-rewind-time/actions/workflows/lint.yml/badge.svg)](https://github.com/dceoy/git-rewind-time/actions/workflows/lint.yml)
+[![CI/CD](https://github.com/dceoy/git-rewind-time/actions/workflows/ci.yml/badge.svg)](https://github.com/dceoy/git-rewind-time/actions/workflows/ci.yml)
 
 Installation
 ------------
